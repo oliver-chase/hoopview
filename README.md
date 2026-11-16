@@ -134,13 +134,13 @@ The result is a simple workflow: **point HoopView at an existing embroidery fold
 
 ## Tests
 
-HoopView needs nothing installed. The tests are for anyone changing the file readers. They use the test runner built into Node, so install Node 18 or newer from nodejs.org first. They need no packages.
+HoopView needs nothing installed. The tests are for anyone changing the file readers. They use the test runner built into Node, so install Node 18 or newer from nodejs.org first. They need no packages, and the commit gates that run before them need python3 and perl, which macOS and most Linux systems include.
 
 ```bash
 bash scripts/validate.sh
 ```
 
-After cloning, run `git config core.hooksPath .githooks` once, so the pre-commit hook runs these tests before every commit. Each commit message also needs a story number, such as `(#53)`.
+After cloning, run `git config core.hooksPath .githooks` once, so the pre-commit hook runs this validation before every commit. Each commit message also needs a story number, such as `(#53)`.
 
 The tests load the readers straight out of `hoopview.html` and check them against sample designs they build from known stitches, so they contain no one's real designs. They cover stitch positions, jumps, color changes, the thread palette, the flipped DST axis and the coordinate limits of both formats.
 
@@ -155,7 +155,7 @@ The tests load the readers straight out of `hoopview.html` and check them agains
 
 ### Folders
 
-* `scripts/` holds the validation command
+* `scripts/` holds the validation command and the shared size, duplication and structure checks the hooks call
 * `tests/` holds the parser tests
 * `.githooks/` holds the commit hooks
-* `docs/` holds the catalog, sharing record, structure contract, accepted audit rows, audit ledger and backlog config
+* `docs/` holds the catalog, sharing record, structure contract, accepted audit rows, audit ledger, backlog config and the gates' size baseline and exemption lists

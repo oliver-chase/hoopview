@@ -33,11 +33,11 @@ This repo works on `main`.
 
 ## Enforcement
 
-1. `bash scripts/validate.sh`, which runs the parser tests with the Node built-in runner
-2. `.githooks/pre-commit` runs that command before every commit, and `.githooks/commit-msg` requires a story number
+1. `bash scripts/validate.sh` runs OliverCode's commit gates over every tracked file, `scripts/check-structure-contract.mjs` and the parser tests with the Node built-in runner
+2. `.githooks/pre-commit` is the fleet hook that `olivercode sync-hooks` installs. It runs the gates over the staged files, then `.githooks/pre-commit.local`, which runs `scripts/validate.sh`
+3. `.githooks/commit-msg` requires a story number, and `.githooks/pre-push` refuses a history rewrite and scans pushed commits for secrets
+4. `docs/SIZE-BASELINE.json` holds the size ratchet's baseline, and `docs/PII-GATE.json` and `docs/IDENTIFIER-GATE.json` list the files those gates skip, each with a reason
 
 ## Contract exceptions
 
-- hooks: the app is one HTML file of about 1,100 lines, and the template's 578-line pre-commit gate suite would be larger than the app. Its own pre-commit runs the tests and the shared commit-msg hook runs unchanged. Expires 2027-05-11
-- managed-files: the shared scaffold (quality baseline, structure check, size and duplication scripts, workflow) is not installed, for the same reason. Expires 2027-05-11
-- size: no size baseline, because the repo has one app file and the audit's own size check reports it. Expires 2027-05-11
+None.
