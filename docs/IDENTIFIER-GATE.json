@@ -1,0 +1,16 @@
+{
+  "_comment": "The owner-identifier gate's per-repo lists: config files to read for account names, and local-data files allowed to hold an identifier, each with a reason.",
+  "configGlobs": [],
+  "localData": [
+    ".github/CODEOWNERS",
+    ".mailmap",
+    "LICENSE",
+    "docs/AUDIT-ACCEPTED.md"
+  ],
+  "localDataReasons": {
+    ".github/CODEOWNERS": "GitHub requires the owner's account name to assign reviews.",
+    ".mailmap": "It maps the early commits' author names and addresses to the public account, so it has to name them.",
+    "LICENSE": "The copyright line names the rights holder by its public account name.",
+    "docs/AUDIT-ACCEPTED.md": "Each accepted portability row names the history address it accepts, which the done check matches word for word."
+  }
+}

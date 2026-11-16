@@ -1,0 +1,11 @@
+{
+  "_comment": "Files the PII gate skips because they hold the patterns it blocks, each with a reason.",
+  "exempt": [
+    ".mailmap",
+    "docs/AUDIT-ACCEPTED.md"
+  ],
+  "reasons": {
+    ".mailmap": "It maps the early commits' author addresses to the public noreply address, so it has to name those addresses.",
+    "docs/AUDIT-ACCEPTED.md": "Each accepted portability row names the history address it accepts, which the done check matches word for word."
+  }
+}

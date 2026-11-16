@@ -83,7 +83,8 @@
   .folder-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
     cursor: pointer; display: flex; flex-direction: column; align-items: center;
     justify-content: center; height: 208px; transition: transform 0.08s, box-shadow 0.08s; }
-  .folder-card .fic { font-size: 54px; line-height: 1; }
+  .folder-card .fic { position: relative; width: 56px; height: 40px; margin-top: 8px; border-radius: 3px 6px 6px 6px; background: var(--accent-fill); }
+  .folder-card .fic::before { content: ''; position: absolute; left: 0; top: -7px; width: 24px; height: 8px; border-radius: 3px 3px 0 0; background: inherit; }
   .folder-card .fname { margin-top: 10px; font-weight: 500; font-size: 13px; padding: 0 10px;
     text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
   .folder-card .fsub { color: var(--muted); font-size: 11px; margin-top: 3px; }
@@ -184,7 +185,7 @@
     <canvas id="lbCanvas" width="600" height="600"></canvas>
     <div class="lb-meta" id="lbName"></div>
     <div class="lb-play">
-      <button type="button" id="lbPlayBtn">▶ Play</button>
+      <button type="button" id="lbPlayBtn">Play</button>
       <input type="range" id="lbScrub" min="0" max="1000" value="1000" aria-label="Playback position">
       <select id="lbSpeed" aria-label="Playback speed">
         <option value="1">1×</option><option value="2">2×</option><option value="5">5×</option>
@@ -495,7 +496,7 @@ function renderTreeNode(node, depth) {
   const caret = document.createElement('span'); caret.className = 'caret';
   const hasChildren = node.folders.size > 0;
   if (!hasChildren) caret.classList.add('leaf');
-  caret.textContent = '▶';
+  caret.textContent = '›';
   const label = document.createElement('span'); label.textContent = node.name;
   const cnt = document.createElement('span'); cnt.className = 'tcount'; cnt.textContent = countFilesDeep(node);
   row.appendChild(caret); row.appendChild(label); row.appendChild(cnt); wrap.appendChild(row);
@@ -628,7 +629,7 @@ function showGrid(folders, files, statusText, showPath) {
 
   for (const child of folders) {
     const fc = document.createElement('div'); fc.className = 'folder-card';
-    const ic = document.createElement('div'); ic.className='fic'; ic.textContent='📁';
+    const ic = document.createElement('div'); ic.className='fic';
     const nm = document.createElement('div'); nm.className='fname'; nm.textContent=child.name;
     const sb = document.createElement('div'); sb.className='fsub'; sb.textContent = plural(countFilesDeep(child), 'design');
     fc.appendChild(ic); fc.appendChild(nm); fc.appendChild(sb);
@@ -984,7 +985,7 @@ function drawPlayback() {
   }
   lbScrub.value = Math.round(lbProgress * 1000);
 }
-function paintPlayBtn() { lbPlayBtn.textContent = lbProgress >= 1 ? '↻ Replay' : '▶ Play'; }
+function paintPlayBtn() { lbPlayBtn.textContent = lbProgress >= 1 ? 'Replay' : 'Play'; }
 function stopPlayback() {
   lbPlaying = false; cancelAnimationFrame(lbRaf);
   paintPlayBtn();
@@ -999,7 +1000,7 @@ function frame(now) {
 function startPlayback() {
   if (!lbDesign) return;
   if (lbProgress >= 1) lbProgress = 0;
-  lbPlaying = true; lbPlayBtn.textContent = '❚❚ Pause';
+  lbPlaying = true; lbPlayBtn.textContent = 'Pause';
   lbP0 = lbProgress; lbT0 = performance.now();
   lbRaf = requestAnimationFrame(frame);
 }
@@ -1095,7 +1096,7 @@ document.addEventListener('keydown', e => {
 async function openLightbox(item) {
   const { fileRef } = item, token = ++lbToken;
   stopPlayback(); lbDesign = null; lbProgress = 1; lbScrub.value = 1000; lbBlock.textContent = '';
-  lbPlayBtn.textContent = '▶ Play';
+  lbPlayBtn.textContent = 'Play';
   lbJumps.checked = false; buildSwatches();
   lbItem = item;
   const canvas = lbCanvas;
@@ -1114,7 +1115,7 @@ async function openLightbox(item) {
     const design = parseFile(fileRef.name, buffer);
     if (!design.stitches.length) throw new Error('Unsupported');
     lbInfo = renderToCanvas(canvas, design);
-    lbDesign = design; lbPlayBtn.textContent = '▶ Play'; buildSwatches();
+    lbDesign = design; lbPlayBtn.textContent = 'Play'; buildSwatches();
     // The preview read downloaded the file, so a card that timed out or failed can draw now.
     // A queued card is already waiting or rendering, so it is left alone.
     if ((item.state === 'idle' || item.state === 'failed') && nav && item.card.isConnected) { item.state = 'queued'; nav.queue.push(item); pump(nav); }
