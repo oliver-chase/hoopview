@@ -822,6 +822,12 @@ document.addEventListener('keydown', e => {
 // when you open the folder a file lives in. This keeps cloud-backed folders
 // (OneDrive/iCloud/Dropbox) from stalling, since we don't force every
 // placeholder file to download just to build the library.
+// Every loader describes a design the same way: its name, its path and a way to get its File.
+function lazyFileRef(name, path, getFile) {
+  const read = async () => (await getFile()).arrayBuffer();
+  const meta = async () => { const f = await getFile(); return { size: f.size, mtime: f.lastModified }; };
+  return { name, path, read, meta };
+}
 function finishLoading() {
   dropWrap.hidden = true;
   searchEl.hidden = false; searchEl.value = ''; clearCacheBtn.hidden = false;
@@ -842,13 +848,7 @@ async function loadDirectoryHandle(dirHandle) {
   async function walk(handle, prefix) {
     for await (const entry of handle.values()) {
       if (entry.kind === 'file' && supported(entry.name)) {
-        const fileEntry = entry;
-        await addDesign({
-          name: fileEntry.name,
-          path: prefix + fileEntry.name,
-          read: async () => { const f = await fileEntry.getFile(); return f.arrayBuffer(); },
-          meta: async () => { const f = await fileEntry.getFile(); return { size: f.size, mtime: f.lastModified }; }
-        }, gen);
+        await addDesign(lazyFileRef(entry.name, prefix + entry.name, () => entry.getFile()), gen);
       } else if (entry.kind === 'directory') {
         await walk(entry, prefix + entry.name + '/');
       }
@@ -869,7 +869,7 @@ async function loadFiles(files) {
   try {
     for (const f of list) {
       const rel = f.webkitRelativePath || (rootName + '/' + f.name);
-      await addDesign({ name: f.name, path: rel, read: () => f.arrayBuffer(), meta: async () => ({ size: f.size, mtime: f.lastModified }) }, gen);
+      await addDesign(lazyFileRef(f.name, rel, async () => f), gen);
     }
   } catch (e) { if (e instanceof StaleScan) return; throw e; }
   finishLoading();
@@ -882,15 +882,7 @@ async function loadDrop(items) {
   const gen = beginScan((roots.length === 1 && roots[0].isDirectory) ? roots[0].name : 'Designs');
   async function traverse(entry, prefix) {
     if (entry.isFile) {
-      if (supported(entry.name)) {
-        const fileEntry = entry;
-        await addDesign({
-          name: fileEntry.name,
-          path: prefix + fileEntry.name,
-          read: () => new Promise((res, rej) => fileEntry.file(f => f.arrayBuffer().then(res, rej), rej)),
-          meta: () => new Promise((res, rej) => fileEntry.file(f => res({ size: f.size, mtime: f.lastModified }), rej))
-        }, gen);
-      }
+      if (supported(entry.name)) await addDesign(lazyFileRef(entry.name, prefix + entry.name, () => new Promise((res, rej) => entry.file(res, rej))), gen);
     } else if (entry.isDirectory) {
       const reader = entry.createReader();
       const readBatch = () => new Promise((res, rej) => reader.readEntries(res, rej));
