@@ -184,7 +184,7 @@
     <button type="button" id="lbClose" class="secondary lb-close" aria-label="Close preview">Close</button>
     <canvas id="lbCanvas" width="600" height="600"></canvas>
     <div class="lb-meta" id="lbName"></div>
-    <div class="lb-play">
+    <div class="lb-play lb-tool" hidden>
       <button type="button" id="lbPlayBtn">Play</button>
       <input type="range" id="lbScrub" min="0" max="1000" value="1000" aria-label="Playback position">
       <select id="lbSpeed" aria-label="Playback speed">
@@ -193,7 +193,7 @@
       </select>
     </div>
     <div class="lb-block" id="lbBlock"></div>
-    <div class="lb-colors" id="lbColors">
+    <div class="lb-colors lb-tool" id="lbColors" hidden>
       <div class="lb-swatches" id="lbSwatches" aria-label="Color blocks"></div>
       <div class="lb-palette" id="lbPalette" aria-label="Thread palette"></div>
       <div class="lb-colorbar">
@@ -203,7 +203,7 @@
       </div>
     </div>
     <dl class="lb-stats" id="lbStats"></dl>
-    <div class="lb-controls">
+    <div class="lb-controls lb-tool" hidden>
       <label>Machine speed <input type="number" id="lbSpm" min="100" max="2000" step="50"> stitches/min</label>
     </div>
     <div class="lb-sub" id="lbSub"></div>
@@ -1074,6 +1074,8 @@ document.getElementById('lbResetColors').addEventListener('click', () => {
 });
 lbJumps.addEventListener('change', () => { if (lbDesign) { lbDesign.showJumps = lbJumps.checked; drawPlayback(); } });
 
+// Play, recolor and machine speed need a loaded design, so they stay hidden while it loads or when it cannot be previewed.
+const setLbTools = on => document.querySelectorAll('#lightbox .lb-tool').forEach(el => { el.hidden = !on; });
 let lbItem = null;   // the card whose preview is open
 function closeLightbox() {
   lbToken++; stopPlayback(); lightbox.classList.remove('open');
@@ -1108,14 +1110,14 @@ async function openLightbox(item) {
   const { fileRef } = item, token = ++lbToken;
   stopPlayback(); lbDesign = null; lbProgress = 1; lbScrub.value = 1000; lbBlock.textContent = '';
   lbPlayBtn.textContent = 'Play';
-  lbJumps.checked = false; buildSwatches();
+  lbJumps.checked = false; buildSwatches(); setLbTools(false);
   lbItem = item;
   const canvas = lbCanvas;
   canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
   document.getElementById('lbName').textContent = fileRef.name; canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', fileRef.name);
   document.getElementById('lbSub').textContent = 'loading…';
   lbInfo = null; renderStats(); lbSpm.value = getSpm();
-  lightbox.classList.add('open'); lbPlayBtn.focus();
+  lightbox.classList.add('open'); document.getElementById('lbClose').focus();
   try {
     if (isListedOnly(fileRef.name)) {   // no parser: show the note without reading the file
       document.getElementById('lbSub').textContent = `Can't preview · preview not supported yet · ${fileRef.path}`;
@@ -1126,7 +1128,7 @@ async function openLightbox(item) {
     const design = parseFile(fileRef.name, buffer);
     if (!design.stitches.length) throw new Error('Unsupported');
     lbInfo = renderToCanvas(canvas, design);
-    lbDesign = design; lbPlayBtn.textContent = 'Play'; buildSwatches();
+    lbDesign = design; lbPlayBtn.textContent = 'Play'; buildSwatches(); setLbTools(true); lbPlayBtn.focus();
     // The preview read downloaded the file, so a card that timed out or failed can draw now.
     // A queued card is already waiting or rendering, so it is left alone.
     if ((item.state === 'idle' || item.state === 'failed') && nav && item.card.isConnected) { item.state = 'queued'; nav.queue.push(item); pump(nav); }
