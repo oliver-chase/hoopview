@@ -158,4 +158,7 @@ The tests load the readers straight out of `hoopview.html` and check them agains
 * `scripts/` holds the validation command and the shared size, duplication and structure checks the hooks call
 * `tests/` holds the parser tests
 * `.githooks/` holds the commit hooks
+* `.github/` holds the code owner file
 * `docs/` holds the catalog, sharing record, structure contract, accepted audit rows, audit ledger, backlog config and the gates' size baseline and exemption lists
+
+The top level also holds `LICENSE`, `SECURITY.md` (how to report a problem), `QUALITY_BASELINE.md` (where the shared quality files come from), `.mailmap` and `.gitignore`.
