@@ -513,7 +513,18 @@ function renderTreeNode(node, depth) {
   setOpen(depth === 0);
   return wrap;
 }
-function setActiveTreeRow(path) { document.querySelectorAll('.trow').forEach(r => r.classList.toggle('active', r.dataset.path === path)); }
+// Marks the open folder in the sidebar, and expands its parents so the row is never hidden.
+function setActiveTreeRow(path) {
+  let active = null;
+  document.querySelectorAll('.trow').forEach(r => { const on = r.dataset.path === path; r.classList.toggle('active', on); if (on) active = r; });
+  if (!active) return;
+  for (let kids = active.parentElement.parentElement; kids.classList.contains('tchildren'); kids = kids.parentElement.parentElement) {
+    kids.classList.add('open');
+    const row = kids.previousElementSibling;
+    row.setAttribute('aria-expanded', 'true'); row.firstElementChild.classList.add('open');
+  }
+  active.scrollIntoView({ block: 'nearest' });
+}
 function renderBreadcrumb(path) {
   breadcrumb.hidden = false; breadcrumb.innerHTML = '';
   const parts = path.split('/').filter(Boolean); let acc = '';
