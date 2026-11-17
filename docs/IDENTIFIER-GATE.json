@@ -3,14 +3,12 @@
   "configGlobs": [],
   "localData": [
     ".github/CODEOWNERS",
-    ".mailmap",
     "LICENSE",
-    "docs/AUDIT-ACCEPTED.md"
+    "README.md"
   ],
   "localDataReasons": {
     ".github/CODEOWNERS": "GitHub requires the owner's account name to assign reviews.",
-    ".mailmap": "It maps the early commits' author names and addresses to the public account, so it has to name them.",
     "LICENSE": "The copyright line names the rights holder by its public account name.",
-    "docs/AUDIT-ACCEPTED.md": "Each accepted portability row names the history address it accepts, which the done check matches word for word."
+    "README.md": "The download step links the file in the public repository, which names the account."
   }
 }
