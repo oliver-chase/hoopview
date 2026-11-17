@@ -41,3 +41,4 @@ This repo works on `main`.
 ## Contract exceptions
 
 None.
+- learning: a local viewer tool with no usage data. Expires 2027-02-01
