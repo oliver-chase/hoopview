@@ -620,7 +620,7 @@ function showGrid(folders, files, statusText, showPath) {
   sidebar.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false');
   const gen = ++navGen;
   if (nav) nav.observer.disconnect();
-  grid.innerHTML = '';
+  grid.innerHTML = ''; document.getElementById('content').scrollTop = 0;   // a new view starts at the top
   nav = { gen, queue: [], active: 0, observer: null };
   const cur = nav;
   cur.observer = new IntersectionObserver(entries => {
