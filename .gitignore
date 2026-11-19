@@ -7,3 +7,11 @@
 # Secrets stay out of git
 .env
 .env.*
+
+# Credentials and secrets
+!.env.example
+!.env.local.example
+*.pem
+*.key
+.secrets/*
+!.secrets/README.md
