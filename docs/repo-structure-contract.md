@@ -42,3 +42,7 @@ This repo works on `main`.
 
 None.
 - learning: a local viewer tool with no usage data. Expires 2027-02-01
+
+## Top-level folders
+
+- `tests/`: automated tests
