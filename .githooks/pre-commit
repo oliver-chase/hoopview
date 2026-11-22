@@ -353,6 +353,21 @@ for number, line in enumerate(sys.stdin, 1):
   echo "  Gate 3 passed ($(wc -l < "$ID_LIST" | tr -d ' ') identifiers derived)."
 fi
 
+# ─── Version files ────────────────────────────────────────────────────────────
+GATE_NAME="Version files"
+# VERSION-FILES-1. VERSION and CHANGELOG.md belong to the daily cut (`olivercode version-cut`, docs/VERSIONING.md),
+# so an ordinary commit cannot stage either one. The cut sets OLIVERCODE_VERSION_CUT=1 for its own commit.
+# `validate.sh --tree` stages nothing, so the tree scan skips this gate.
+if [ "${OLIVERCODE_SCAN_TREE:-}" != 1 ] && [ "${OLIVERCODE_VERSION_CUT:-}" != 1 ]; then
+  VERSION_STAGED="$(printf '%s\n' "$STAGED_FILES" | grep -xE 'VERSION|CHANGELOG\.md' || true)"
+  if [ -n "$VERSION_STAGED" ]; then
+    echo "  BLOCKED: $(printf '%s' "$VERSION_STAGED" | tr '\n' ' ')belongs to the daily version cut and no ordinary commit edits it."
+    echo "  Unstage it with: git restore --staged VERSION CHANGELOG.md"
+    echo "  The cut writes both files once per day of activity (docs/VERSIONING.md)."
+    exit 1
+  fi
+fi
+
 # ─── Repo-local gates ─────────────────────────────────────────────────────────
 GATE_NAME="Repo-local gates"
 # GATE-LOCAL-1. A repo adds its own blocking checks in two ways, and sync-hooks never overwrites either.
